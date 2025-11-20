@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Олимпиадаға тіркелу</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+<div class="container">
+  <h1>Олимпиадаға тіркелу</h1>
+  <form id="olympForm">
+    <label>Аты-жөні</label>
+    <input name="name" required>
+    <label>Email</label>
+    <input type="email" name="email" required>
+    <label>Сынып / топ</label>
+    <input name="grade">
+    <label>Пәнді таңдаңыз</label>
+    <select name="subject" id="subjectSelect" required>
+      <option value="">-- Таңдаңыз --</option>
+      <option value="math">Математика</option>
+      <option value="physics">Физика</option>
+      <option value="informatics">Информатика</option>
+      <option value="english">Ағылшын</option>
+    </select>
+    <label>Кураторды таңдаңыз</label>
+    <select name="teacher" id="teacherSelect" required disabled>
+      <option value="">-- Алдымен пәнді таңдаңыз --</option>
+    </select>
+    <button type="submit">Жіберу</button>
+  </form>
+  <p id="status"></p>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "ТВОЙ_API_KEY",
+  authDomain: "ТВОЙ_AUTH_DOMAIN",
+  databaseURL: "https://olymp-portal-default-rtdb.firebaseio.com/",
+  projectId: "olymp-portal",
+  storageBucket: "olymp-portal.appspot.com",
+  messagingSenderId: "310726558368",
+  appId: "1:310726558368:web:9a202816fbbccf667effc5"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const subjectSelect = document.getElementById('subjectSelect');
+const teacherSelect = document.getElementById('teacherSelect');
+
+const teachersBySubject = {
+  math: ['Математика Куратор 1','Математика Куратор 2','Математика Куратор 3'],
+  physics: ['Физика Куратор 1','Физика Куратор 2','Физика Куратор 3'],
+  informatics: ['Информатика Куратор 1','Информатика Куратор 2','Информатика Куратор 3'],
+  english: ['Ағылшын Куратор 1','Ағылшын Куратор 2','Ағылшын Куратор 3']
+};
+
+subjectSelect.addEventListener('change', ()=>{
+  const selected = subjectSelect.value;
+  teacherSelect.innerHTML = '';
+  if(selected && teachersBySubject[selected]){
+    teachersBySubject[selected].forEach(t=>{
+      const opt = document.createElement('option');
+      opt.value = t; // сохраняем имя куратора
+      opt.textContent = t;
+      teacherSelect.appendChild(opt);
+    });
+    teacherSelect.disabled = false;
+  } else {
+    teacherSelect.innerHTML = '<option value="">-- Алдымен пәнді таңдаңыз --</option>';
+    teacherSelect.disabled = true;
+  }
+});
+
+document.getElementById('olympForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const form = new FormData(e.target);
+  const student = {
+    name: form.get('name').trim(),
+    email: form.get('email').trim(),
+    grade: form.get('grade').trim() || '-',
+    subject: form.get('subject'),
+    teacher: form.get('teacher'),
+    createdAt: Date.now()
+  };
+
+  const ref = db.ref(`subjects/${student.subject}`);
+  // Проверка по email, чтобы нельзя было отправить дважды
+  ref.orderByChild('email').equalTo(student.email).once('value').then(snapshot=>{
+    if(snapshot.exists()){
+      document.getElementById('status').textContent = 'Сіз бұл пән бойынша жауапты бұрын жібердіңіз.';
+    } else {
+      ref.push().set(student).then(()=>{
+        document.getElementById('status').textContent = 'Жіберілді!';
+        e.target.reset();
+        teacherSelect.disabled = true;
+      });
+    }
+  });
+});
+</script>
+</body>
+</html>

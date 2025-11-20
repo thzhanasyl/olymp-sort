@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Админ панель</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+<div class="container">
+<h1>Админ панель</h1>
+<button id="toggleEdit">Редактирлеу режимін қосу</button>
+<table border="1" width="100%" id="studentsTable">
+<thead>
+<tr><th>Аты-жөні</th><th>Email</th><th>Сынып</th><th>Пән</th><th>Куратор</th><th>Тіркелген уақыт</th><th>Әрекет</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "ТВОЙ_API_KEY",
+  authDomain: "ТВОЙ_AUTH_DOMAIN",
+  databaseURL: "https://olymp-portal-default-rtdb.firebaseio.com/",
+  projectId: "olymp-portal",
+  storageBucket: "olymp-portal.appspot.com",
+  messagingSenderId: "310726558368",
+  appId: "1:310726558368:web:9a202816fbbccf667effc5"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const tableBody = document.querySelector('#studentsTable tbody');
+let editMode = false;
+
+document.getElementById('toggleEdit').addEventListener('click', ()=>{
+  editMode = !editMode;
+  document.getElementById('toggleEdit').textContent = editMode ? 'Редактирлеу режимін өшіру':'Редактирлеу режимін қосу';
+  loadStudents();
+});
+
+function loadStudents(){
+  tableBody.innerHTML = '';
+  db.ref('subjects').once('value').then(snapshot=>{
+    const subjects = snapshot.val();
+    if(!subjects) return;
+    for(const subject in subjects){
+      for(const id in subjects[subject]){
+        const student = subjects[subject][id];
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${student.name}</td>
+          <td>${student.email}</td>
+          <td>${student.grade}</td>
+          <td>${subject}</td>
+          <td>${student.teacher}</td>
+          <td>${new Date(student.createdAt).toLocaleString()}</td>
+          <td>${editMode?`<button class='deleteBtn' data-subject='${subject}' data-id='${id}'>Жою</button>`:''}</td>
+        `;
+        tableBody.appendChild(row);
+      }
+    }
+  });
+}
+
+// Удаление студентов
+tableBody.addEventListener('click', e=>{
+  if(e.target.classList.contains('deleteBtn')){
+    const subject = e.target.dataset.subject;
+    const id = e.target.dataset.id;
+    if(confirm('Сіз осы студентті өшіргіңіз келе ме?')){
+      db.ref(`subjects/${subject}/${id}`).remove().then(()=>loadStudents());
+    }
+  }
+});
+
+loadStudents();
+</script>
+</body>
+</html>

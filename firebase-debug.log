@@ -1,0 +1,46 @@
+[debug] [2025-11-17T11:26:53.843Z] ----------------------------------------------------------------------
+[debug] [2025-11-17T11:26:53.847Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Orion\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2025-11-17T11:26:53.847Z] CLI Version:   14.25.0
+[debug] [2025-11-17T11:26:53.848Z] Platform:      win32
+[debug] [2025-11-17T11:26:53.848Z] Node Version:  v24.11.1
+[debug] [2025-11-17T11:26:53.848Z] Time:          Mon Nov 17 2025 16:26:53 GMT+0500 (Казахстан)
+[debug] [2025-11-17T11:26:53.848Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-11-17T11:26:54.164Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-11-17T11:26:54.164Z] > authorizing via signed-in user (thzhanasyl@gmail.com)
+[debug] [2025-11-17T11:26:54.165Z] [iam] checking project olymp-portal for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2025-11-17T11:26:54.166Z] Checked if tokens are valid: true, expires at: 1763382053974
+[debug] [2025-11-17T11:26:54.166Z] Checked if tokens are valid: true, expires at: 1763382053974
+[debug] [2025-11-17T11:26:54.168Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/olymp-portal:testIamPermissions [none]
+[debug] [2025-11-17T11:26:54.168Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/olymp-portal:testIamPermissions x-goog-quota-user=projects/olymp-portal
+[debug] [2025-11-17T11:26:54.168Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/olymp-portal:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-11-17T11:26:55.426Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/olymp-portal:testIamPermissions 200
+[debug] [2025-11-17T11:26:55.426Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/olymp-portal:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-11-17T11:26:55.427Z] Checked if tokens are valid: true, expires at: 1763382053974
+[debug] [2025-11-17T11:26:55.427Z] Checked if tokens are valid: true, expires at: 1763382053974
+[debug] [2025-11-17T11:26:55.427Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/olymp-portal [none]
+[debug] [2025-11-17T11:26:56.118Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/olymp-portal 200
+[debug] [2025-11-17T11:26:56.118Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/olymp-portal {"projectId":"olymp-portal","projectNumber":"310726558368","displayName":"olymp-portal","name":"projects/olymp-portal","resources":{"hostingSite":"olymp-portal","realtimeDatabaseInstance":"olymp-portal-default-rtdb"},"state":"ACTIVE","etag":"1_fa6b4853-0df6-4a4c-880b-28e246824b17"}
+[info] 
+[info] === Deploying to 'olymp-portal'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2025-11-17T11:26:56.132Z] Checked if tokens are valid: true, expires at: 1763382053974
+[debug] [2025-11-17T11:26:56.132Z] Checked if tokens are valid: true, expires at: 1763382053974
+[debug] [2025-11-17T11:26:56.132Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/olymp-portal/versions [none]
+[debug] [2025-11-17T11:26:56.132Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/olymp-portal/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2025-11-17T11:26:57.822Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/olymp-portal/versions 200
+[debug] [2025-11-17T11:26:57.822Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/olymp-portal/versions {"name":"projects/310726558368/sites/olymp-portal/versions/296f08aa420f93f4","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[olymp-portal]: beginning deploy... 
+[info] i  hosting[olymp-portal]: found 133100 files in . 
+[debug] [2025-11-17T11:27:26.424Z] [hosting] uploading with 200 concurrency
+[debug] [2025-11-17T11:27:26.426Z] [hosting] hash cache [] not populated
+[debug] [2025-11-17T11:27:26.488Z] Error: EBUSY: resource busy or locked, open 'C:\Users\Orion\ntuser.dat.LOG2'
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-11-17T11:27:26.492Z] Error: EBUSY: resource busy or locked, open 'C:\Users\Orion\ntuser.dat.LOG1'
+[error] 
+[error] Error: An unexpected error has occurred.
+[debug] [2025-11-17T11:27:26.499Z] Error: EBUSY: resource busy or locked, open 'C:\Users\Orion\NTUSER.DAT'
+[error] 
+[error] Error: An unexpected error has occurred.
