@@ -100,3 +100,135 @@ button[type="submit"]:hover {
   font-weight: 600;
   color: #333;
 }
+.lang-switch-top {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  display: flex;
+  gap: 6px;
+  z-index: 999;
+}
+
+.lang-switch-top button {
+  background: #eef0f7;
+  border: 1px solid #d0d4dd;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: 0.2s;
+}
+
+.lang-switch-top button:hover {
+  background: #e1e4f5;
+}
+
+.lang-switch-top button.active {
+  background: #4c6ef5;
+  color: #fff;
+  border-color: #4c6ef5;
+}
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f8f9fa;
+  }
+
+  .lang-switch-top {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap; /* Позволяет кнопкам переноситься */
+    gap: 8px;
+    padding: 16px;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .lang-switch-top button {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #e0e0e0;
+    transition: 0.2s;
+    font-size: 14px;
+  }
+
+  .lang-switch-top button.active {
+    background: #4c6ef5;
+    color: white;
+    font-weight: bold;
+  }
+
+  .container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 16px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 16px;
+    color: #4c6ef5;
+    font-size: 24px;
+  }
+
+  form label {
+    display: block;
+    margin-top: 12px;
+    font-weight: bold;
+  }
+
+  form input, form select, form button {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+
+  form button {
+    margin-top: 16px;
+    background: #4c6ef5;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 16px;
+  }
+
+  form button:hover {
+    background: #3b5bdb;
+  }
+
+  #status {
+    margin-top: 12px;
+    font-weight: bold;
+    color: green;
+  }
+
+  /* Адаптивность */
+  @media (max-width: 480px) {
+    .lang-switch-top {
+      justify-content: center;
+      padding: 8px;
+      gap: 4px;
+    }
+
+    .lang-switch-top button {
+      padding: 4px 6px;
+      font-size: 12px;
+    }
+
+    h1 {
+      font-size: 20px;
+    }
+  }
