@@ -3,24 +3,237 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Админ панель</title>
+<title data-i18n="title">Админ панель</title>
+
 <link rel="stylesheet" href="style.css">
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f8f9fa;
+    color: #333;
+  }
+
+  .lang-icons {
+    position: absolute;
+    top: 16px;
+    right: 24px;
+    display: flex;
+    gap: 8px;
+  }
+
+  .lang-icons div {
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: 0.2s;
+    background: #e0e0e0;
+  }
+
+  .lang-icons .active {
+    background: #4c6ef5;
+    color: white;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 80px auto 40px auto;
+    padding: 16px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 16px;
+    color: #4c6ef5;
+  }
+
+  #toggleEdit, #exportExcel {
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    border: none;
+    border-radius: 6px;
+    background: #4c6ef5;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 14px;
+    margin-right: 10px;
+  }
+
+  #toggleEdit:hover, #exportExcel:hover {
+    background: #3b5bdb;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+  }
+
+  th, td {
+    padding: 12px 8px;
+    text-align: left;
+  }
+
+  th {
+    background: #4c6ef5;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+  tr:nth-child(even) {
+    background: #f1f3f5;
+  }
+
+  button.deleteBtn {
+    padding: 6px 10px;
+    border: none;
+    background: #fa5252;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  button.deleteBtn:hover {
+    background: #c92a2a;
+  }
+
+  /* Адаптивность */
+  @media (max-width: 768px) {
+    .container {
+      margin: 40px 8px;
+      padding: 12px;
+    }
+    table {
+      display: block;
+      overflow-x: auto;
+    }
+    th, td {
+      white-space: nowrap;
+      font-size: 12px;
+      padding: 8px 6px;
+    }
+    #toggleEdit, #exportExcel {
+      font-size: 12px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+    }
+  }
+</style>
 </head>
+
 <body>
+
+<div class="lang-icons">
+  <div data-lang="kk" class="active">KZ</div>
+  <div data-lang="ru">RU</div>
+  <div data-lang="en">EN</div>
+</div>
+
 <div class="container">
-<h1>Админ панель</h1>
-<button id="toggleEdit">Редактирлеу режимін қосу</button>
-<table border="1" width="100%" id="studentsTable">
+
+<h1 data-i18n="header">Админ панель</h1>
+
+<button id="toggleEdit" data-i18n="edit_on">Редактирлеу режимін қосу</button>
+<button id="exportExcel">Export to Excel</button>
+
+<table border="1" id="studentsTable">
 <thead>
-<tr><th>Аты-жөні</th><th>Email</th><th>Сынып</th><th>Пән</th><th>Куратор</th><th>Тіркелген уақыт</th><th>Әрекет</th></tr>
+<tr>
+  <th data-i18n="col_name">Аты-жөні</th>
+  <th>Email</th>
+  <th data-i18n="col_grade">Сынып</th>
+  <th data-i18n="col_subj">Пән</th>
+  <th data-i18n="col_teacher">Куратор</th>
+  <th data-i18n="col_time">Тіркелген уақыт</th>
+  <th data-i18n="col_action">Әрекет</th>
+</tr>
 </thead>
 <tbody></tbody>
 </table>
+
 </div>
 
 <script>
+const t = {
+  kk: {
+    title: "Админ панель",
+    header: "Админ панель",
+    edit_on: "Редактирлеу режимін қосу",
+    edit_off: "Редактирлеу режимін өшіру",
+    col_name: "Аты-жөні",
+    col_grade: "Сынып",
+    col_subj: "Пән",
+    col_teacher: "Куратор",
+    col_time: "Тіркелген уақыт",
+    col_action: "Әрекет",
+    delete_confirm: "Осы студентті өшіргіңіз келе ме?",
+    delete_btn: "Жою"
+  },
+  ru: {
+    title: "Админ панель",
+    header: "Админ панель",
+    edit_on: "Включить режим редактирования",
+    edit_off: "Выключить режим редактирования",
+    col_name: "ФИО",
+    col_grade: "Класс",
+    col_subj: "Предмет",
+    col_teacher: "Куратор",
+    col_time: "Время регистрации",
+    col_action: "Действие",
+    delete_confirm: "Удалить этого студента?",
+    delete_btn: "Удалить"
+  },
+  en: {
+    title: "Admin Panel",
+    header: "Admin Panel",
+    edit_on: "Enable edit mode",
+    edit_off: "Disable edit mode",
+    col_name: "Full Name",
+    col_grade: "Grade",
+    col_subj: "Subject",
+    col_teacher: "Teacher",
+    col_time: "Registered At",
+    col_action: "Action",
+    delete_confirm: "Do you want to delete this student?",
+    delete_btn: "Delete"
+  }
+};
+
+let currentLang = "kk";
+function applyLang() {
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    el.textContent = t[currentLang][key];
+  });
+  document.title = t[currentLang].title;
+}
+
+document.querySelectorAll(".lang-icons div").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".lang-icons div").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentLang = btn.dataset.lang;
+    applyLang();
+    loadStudents();
+  });
+});
+
+applyLang();
+
 const firebaseConfig = {
   apiKey: "ТВОЙ_API_KEY",
   authDomain: "ТВОЙ_AUTH_DOMAIN",
@@ -30,54 +243,65 @@ const firebaseConfig = {
   messagingSenderId: "310726558368",
   appId: "1:310726558368:web:9a202816fbbccf667effc5"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-const tableBody = document.querySelector('#studentsTable tbody');
+
+const tableBody = document.querySelector("#studentsTable tbody");
 let editMode = false;
 
-document.getElementById('toggleEdit').addEventListener('click', ()=>{
+document.getElementById("toggleEdit").addEventListener("click", () => {
   editMode = !editMode;
-  document.getElementById('toggleEdit').textContent = editMode ? 'Редактирлеу режимін өшіру':'Редактирлеу режимін қосу';
+  document.getElementById("toggleEdit").textContent =
+    editMode ? t[currentLang].edit_off : t[currentLang].edit_on;
   loadStudents();
 });
 
-function loadStudents(){
-  tableBody.innerHTML = '';
-  db.ref('subjects').once('value').then(snapshot=>{
+function loadStudents() {
+  tableBody.innerHTML = "";
+  db.ref("subjects").once("value").then(snapshot => {
     const subjects = snapshot.val();
-    if(!subjects) return;
-    for(const subject in subjects){
-      for(const id in subjects[subject]){
-        const student = subjects[subject][id];
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${student.name}</td>
-          <td>${student.email}</td>
-          <td>${student.grade}</td>
+    if (!subjects) return;
+
+    for (const subject in subjects) {
+      for (const id in subjects[subject]) {
+        const s = subjects[subject][id];
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${s.name}</td>
+          <td>${s.email}</td>
+          <td>${s.grade}</td>
           <td>${subject}</td>
-          <td>${student.teacher}</td>
-          <td>${new Date(student.createdAt).toLocaleString()}</td>
-          <td>${editMode?`<button class='deleteBtn' data-subject='${subject}' data-id='${id}'>Жою</button>`:''}</td>
+          <td>${s.teacher}</td>
+          <td>${new Date(s.createdAt).toLocaleString()}</td>
+          <td>${editMode ? `<button class="deleteBtn" data-subject="${subject}" data-id="${id}">${t[currentLang].delete_btn}</button>` : ""}</td>
         `;
-        tableBody.appendChild(row);
+        tableBody.appendChild(tr);
       }
     }
   });
 }
 
-// Удаление студентов
-tableBody.addEventListener('click', e=>{
-  if(e.target.classList.contains('deleteBtn')){
+tableBody.addEventListener("click", e => {
+  if (e.target.classList.contains("deleteBtn")) {
+    if (!confirm(t[currentLang].delete_confirm)) return;
     const subject = e.target.dataset.subject;
     const id = e.target.dataset.id;
-    if(confirm('Сіз осы студентті өшіргіңіз келе ме?')){
-      db.ref(`subjects/${subject}/${id}`).remove().then(()=>loadStudents());
-    }
+    db.ref(`subjects/${subject}/${id}`).remove().then(() => loadStudents());
   }
 });
 
 loadStudents();
+
+// ------------------------------------------------------------------
+// EXPORT TO EXCEL
+// ------------------------------------------------------------------
+document.getElementById("exportExcel").addEventListener("click", () => {
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.table_to_sheet(document.getElementById("studentsTable"));
+  XLSX.utils.book_append_sheet(wb, ws, "Students");
+  XLSX.writeFile(wb, "students.xlsx");
+});
 </script>
+
 </body>
 </html>
