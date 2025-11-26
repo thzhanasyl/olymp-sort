@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="kk">
+<html lang="kk" lang="ru" lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,101 +7,307 @@
 <link rel="stylesheet" href="style.css">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+  .lang-switch-top button.active { font-weight: bold; }
+</style>
 </head>
 <body>
+
+<div class="lang-switch-top">
+  <h1 class="site-title">Tulkibas Daryn</h1>
+  <div class="lang-buttons">
+    <button data-lang="kk">KZ</button>
+    <button data-lang="ru">RU</button>
+    <button data-lang="en">EN</button>
+  </div>
+</div>
+
+<style>
+.lang-switch-top {
+  display: flex;
+  justify-content: space-between; /* заголовок слева, кнопки справа */
+  align-items: center;
+  padding: 16px;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  flex-wrap: wrap; /* на маленьких экранах кнопки переносятся */
+}
+
+.site-title {
+  font-size: 28px;
+  margin: 0;
+}
+
+.lang-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.lang-buttons button {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #e0e0e0;
+  transition: 0.2s;
+  font-size: 14px;
+}
+
+.lang-buttons button.active {
+  background: #4c6ef5;
+  color: white;
+  font-weight: bold;
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+  .lang-switch-top {
+    flex-direction: column; /* заголовок сверху, кнопки снизу */
+    align-items: center;
+    gap: 8px;
+  }
+
+  .site-title {
+    font-size: 22px;
+  }
+
+  .lang-buttons button {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+}
+</style>
+
+
 <div class="container">
-  <h1>Олимпиадаға тіркелу</h1>
+  <h1 id="formTitle">Олимпиадаға тіркелу</h1>
+
   <form id="olympForm">
-    <label>Аты-жөні</label>
+    <label id="labelName">Аты-жөні</label>
     <input name="name" required>
-    <label>Email</label>
+
+    <label id="labelEmail">Email</label>
     <input type="email" name="email" required>
-    <label>Сынып / топ</label>
+
+    <label id="labelGrade">Сынып / топ</label>
     <input name="grade">
-    <label>Пәнді таңдаңыз</label>
+
+    <label id="labelSubject">Пәнді таңдаңыз</label>
     <select name="subject" id="subjectSelect" required>
-      <option value="">-- Таңдаңыз --</option>
-      <option value="math">Математика</option>
-      <option value="physics">Физика</option>
-      <option value="informatics">Информатика</option>
-      <option value="english">Ағылшын</option>
+      <!-- options будут созданы через JS -->
     </select>
-    <label>Кураторды таңдаңыз</label>
+
+    <label id="labelTeacher">Кураторды таңдаңыз</label>
     <select name="teacher" id="teacherSelect" required disabled>
       <option value="">-- Алдымен пәнді таңдаңыз --</option>
     </select>
-    <button type="submit">Жіберу</button>
+
+    <button type="submit" id="submitButton">Жіберу</button>
   </form>
+
   <p id="status"></p>
 </div>
 
 <script>
-const firebaseConfig = {
-  apiKey: "ТВОЙ_API_KEY",
-  authDomain: "ТВОЙ_AUTH_DOMAIN",
-  databaseURL: "https://olymp-portal-default-rtdb.firebaseio.com/",
-  projectId: "olymp-portal",
-  storageBucket: "olymp-portal.appspot.com",
-  messagingSenderId: "310726558368",
-  appId: "1:310726558368:web:9a202816fbbccf667effc5"
-};
+  // ---------------- Firebase ----------------
+  const firebaseConfig = {
+    apiKey: "ТВОЙ_API_KEY",
+    authDomain: "ТВОЙ_AUTH_DOMAIN",
+    databaseURL: "https://olymp-portal-default-rtdb.firebaseio.com/",
+    projectId: "olymp-portal",
+    storageBucket: "olymp-portal.appspot.com",
+    messagingSenderId: "310726558368",
+    appId: "1:310726558368:web:9a202816fbbccf667effc5"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-const subjectSelect = document.getElementById('subjectSelect');
-const teacherSelect = document.getElementById('teacherSelect');
-
-const teachersBySubject = {
-  math: ['Математика Куратор 1','Математика Куратор 2','Математика Куратор 3'],
-  physics: ['Физика Куратор 1','Физика Куратор 2','Физика Куратор 3'],
-  informatics: ['Информатика Куратор 1','Информатика Куратор 2','Информатика Куратор 3'],
-  english: ['Ағылшын Куратор 1','Ағылшын Куратор 2','Ағылшын Куратор 3']
-};
-
-subjectSelect.addEventListener('change', ()=>{
-  const selected = subjectSelect.value;
-  teacherSelect.innerHTML = '';
-  if(selected && teachersBySubject[selected]){
-    teachersBySubject[selected].forEach(t=>{
-      const opt = document.createElement('option');
-      opt.value = t; // сохраняем имя куратора
-      opt.textContent = t;
-      teacherSelect.appendChild(opt);
-    });
-    teacherSelect.disabled = false;
-  } else {
-    teacherSelect.innerHTML = '<option value="">-- Алдымен пәнді таңдаңыз --</option>';
-    teacherSelect.disabled = true;
-  }
-});
-
-document.getElementById('olympForm').addEventListener('submit', e=>{
-  e.preventDefault();
-  const form = new FormData(e.target);
-  const student = {
-    name: form.get('name').trim(),
-    email: form.get('email').trim(),
-    grade: form.get('grade').trim() || '-',
-    subject: form.get('subject'),
-    teacher: form.get('teacher'),
-    createdAt: Date.now()
+  // ---------------- Кураторлар тізімі ----------------
+  const teachersBySubject = {
+    math: ["Қосақова Қарашаш","Ертай Заңғар","Жалтаева Сафурахон","Елемесов Жамбыл","Советжанқызы Айнұр"],
+    informatics: ["Арман Елубаевич","Тұрсынбаев Самат"],
+    biology: ["Байжанысов Айдос","Сауырбай Жанерке"],
+    chemistry: ["Кадирова Шолпан"],
+    physics: ["Мірабзалов Мірзақадір","Жанисова Жазира","Жакупов Ерасыл"],
+    geography: ["Оналбеков Дінмұхаммед","Арыстанбекова Ұлпан"],
+    english: ["Дузеева Гүлшат","Омарова Жанна","Шалабаев Нұржан"],
+    kazakh: ["Абралиева Алтынгүл","Биомаров Алихан"],
+    russian: ["Туламишова Венера","Құрман Айкен","Калтуреева Ақерке"],
+    law: ["Арыстанбекова Ұлпан"],
+    kazakh_history: ["Құрманбаева Жазира"],
+    world_history: ["Құрманбаева Жазира"]
   };
 
-  const ref = db.ref(`subjects/${student.subject}`);
-  // Проверка по email, чтобы нельзя было отправить дважды
-  ref.orderByChild('email').equalTo(student.email).once('value').then(snapshot=>{
-    if(snapshot.exists()){
-      document.getElementById('status').textContent = 'Сіз бұл пән бойынша жауапты бұрын жібердіңіз.';
-    } else {
-      ref.push().set(student).then(()=>{
-        document.getElementById('status').textContent = 'Жіберілді!';
-        e.target.reset();
-        teacherSelect.disabled = true;
+  // ---------------- Переводы интерфейса ----------------
+  const translations = {
+    kk: {
+      formTitle: "Олимпиадаға тіркелу",
+      labelName: "Аты-жөні",
+      labelEmail: "Email",
+      labelGrade: "Сынып / топ",
+      labelSubject: "Пәнді таңдаңыз",
+      labelTeacher: "Кураторды таңдаңыз",
+      submitButton: "Жіберу",
+      alreadyRegistered: "Сіз бұл пән бойынша бұрын тіркелгенсіз.",
+      success: "Сәтті жіберілді!",
+      select: "Таңдаңыз"
+    },
+    ru: {
+      formTitle: "Регистрация на олимпиаду",
+      labelName: "ФИО",
+      labelEmail: "Email",
+      labelGrade: "Класс / группа",
+      labelSubject: "Выберите предмет",
+      labelTeacher: "Выберите куратора",
+      submitButton: "Отправить",
+      alreadyRegistered: "Вы уже регистрировались по этому предмету.",
+      success: "Успешно отправлено!",
+      select: "Выберите"
+    },
+    en: {
+      formTitle: "Olympiad Registration",
+      labelName: "Full Name",
+      labelEmail: "Email",
+      labelGrade: "Grade / Group",
+      labelSubject: "Select Subject",
+      labelTeacher: "Select Teacher",
+      submitButton: "Submit",
+      alreadyRegistered: "You have already registered for this subject.",
+      success: "Successfully submitted!",
+      select: "Select"
+    }
+  };
+
+  const subjectsTranslations = {
+    kk: {
+      math: "Математика",
+      informatics: "Информатика",
+      biology: "Биология",
+      chemistry: "Химия",
+      physics: "Физика",
+      geography: "География",
+      english: "Ағылшын",
+      kazakh: "Қазақ тілі",
+      russian: "Орыс тілі",
+      law: "Құқық негіздері",
+      kazakh_history: "Қазақстан тарихы",
+      world_history: "Дүние жүзі тарихы"
+    },
+    ru: {
+      math: "Математика",
+      informatics: "Информатика",
+      biology: "Биология",
+      chemistry: "Химия",
+      physics: "Физика",
+      geography: "География",
+      english: "Английский",
+      kazakh: "Казахский язык",
+      russian: "Русский язык",
+      law: "Основы права",
+      kazakh_history: "История Казахстана",
+      world_history: "Всемирная история"
+    },
+    en: {
+      math: "Mathematics",
+      informatics: "Informatics",
+      biology: "Biology",
+      chemistry: "Chemistry",
+      physics: "Physics",
+      geography: "Geography",
+      english: "English",
+      kazakh: "Kazakh",
+      russian: "Russian",
+      law: "Law",
+      kazakh_history: "Kazakh History",
+      world_history: "World History"
+    }
+  };
+
+  const subjectSelect = document.getElementById('subjectSelect');
+  const teacherSelect = document.getElementById('teacherSelect');
+
+  // ---------------- Форма ----------------
+  subjectSelect.addEventListener('change', () => {
+    const selected = subjectSelect.value;
+    teacherSelect.innerHTML = "";
+    if (selected && teachersBySubject[selected]) {
+      teachersBySubject[selected].forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        teacherSelect.appendChild(opt);
       });
+      teacherSelect.disabled = false;
+    } else {
+      teacherSelect.innerHTML = `<option value="">-- ${translations[currentLang].select} --</option>`;
+      teacherSelect.disabled = true;
     }
   });
-});
+
+  document.getElementById('olympForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    const student = {
+      name: form.get('name').trim(),
+      email: form.get('email').trim(),
+      grade: form.get('grade').trim() || '-',
+      subject: form.get('subject'),
+      teacher: form.get('teacher'),
+      createdAt: Date.now()
+    };
+    const ref = db.ref(`subjects/${student.subject}`);
+    ref.orderByChild('email').equalTo(student.email).once('value').then(snapshot => {
+      if (snapshot.exists()) {
+        document.getElementById('status').textContent = translations[currentLang].alreadyRegistered;
+      } else {
+        ref.push().set(student).then(() => {
+          document.getElementById('status').textContent = translations[currentLang].success;
+          e.target.reset();
+          teacherSelect.disabled = true;
+        });
+      }
+    });
+  });
+
+  // ---------------- Языковая логика ----------------
+  let currentLang = localStorage.getItem("lang") || "kk";
+
+  function updateSubjects(lang) {
+    const current = subjectSelect.value;
+    subjectSelect.innerHTML = `<option value="">-- ${translations[lang].select} --</option>`;
+    Object.keys(subjectsTranslations[lang]).forEach(key => {
+      const opt = document.createElement("option");
+      opt.value = key;
+      opt.textContent = subjectsTranslations[lang][key];
+      subjectSelect.appendChild(opt);
+    });
+    subjectSelect.value = current; // сохранить выбранное значение
+  }
+
+  function setLanguage(lang) {
+    currentLang = lang;
+    document.getElementById("formTitle").textContent = translations[lang].formTitle;
+    document.getElementById("labelName").textContent = translations[lang].labelName;
+    document.getElementById("labelEmail").textContent = translations[lang].labelEmail;
+    document.getElementById("labelGrade").textContent = translations[lang].labelGrade;
+    document.getElementById("labelSubject").textContent = translations[lang].labelSubject;
+    document.getElementById("labelTeacher").textContent = translations[lang].labelTeacher;
+    document.getElementById("submitButton").textContent = translations[lang].submitButton;
+
+    updateSubjects(lang);
+
+    document.querySelectorAll(".lang-switch-top button").forEach(b => b.classList.remove("active"));
+    document.querySelector(`.lang-switch-top button[data-lang='${lang}']`).classList.add("active");
+
+    localStorage.setItem("lang", lang);
+  }
+
+  document.querySelectorAll(".lang-switch-top button").forEach(btn => {
+    btn.addEventListener("click", () => setLanguage(btn.dataset.lang));
+  });
+
+  window.addEventListener("DOMContentLoaded", () => setLanguage(currentLang));
 </script>
+
 </body>
 </html>
